@@ -1,0 +1,69 @@
+secrets:
+ db_pswrd:
+  file: ../secrets/db_password.txt
+ db_root_pswrd:
+  file: ../secrets/db_root_password.txt
+ credentials:
+  file: ../secrets/credentials.txt
+
+volumes:
+ db:
+  driver: local
+  name: db
+  driver_opts:
+   type: none
+   o: bind
+   device: ~/data/mariadb
+ wp:
+  driver: local
+  name: wp
+  driver_opts:
+   type: none
+   o: bind
+   device: ~/data/wordpress
+
+networks:
+ dock_net:
+  name: "dock_net"
+  driver: bridge
+
+services:
+ nginx:
+  container_name: nginx
+  build: ./requirements/nginx/
+  restart: unless-stopped
+  ports:
+   - "443:443"
+  depends_on:
+   - wordpress
+  networks:
+   - dock_net
+
+ mariadb:
+  container_name: mariadb
+  build: ./requirements/mariadb/
+  restart: unless-stopped
+  env_file:
+   - .env
+  secrets:
+   - db_root_pswrd
+   - db_pswrd
+  volumes:
+   - db:/var/lib/mysql
+  networks:
+   - dock_net
+
+ wordpress:
+  container_name: wordpress
+  build: ./requirements/wordpress/
+  restart: unless-stopped
+  env_file:
+   - .env
+  secrets:
+   - credentials
+  volumes:
+   - wp:/var/www/html
+  networks:
+   - dock_net
+  depends_on:
+   - mariadb 
