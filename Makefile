@@ -3,7 +3,7 @@ all:
 	mkdir -p $(HOME)/data/mariadb
 	make up
 
-up:
+up: build
 	sudo docker-compose -f ./srcs/docker-compose.yml up
 
 build:
@@ -24,7 +24,6 @@ down:
 fclean: down
 	sudo rm -rf  $(HOME)/data/wordpress
 	sudo rm -rf  $(HOME)/data/mariadb
-
 re: fclean all
 
 .PHONY: up build stop restart remove down fclean re
