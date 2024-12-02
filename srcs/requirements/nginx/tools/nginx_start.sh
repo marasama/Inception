@@ -24,5 +24,6 @@ if [ ! -f /etc/ssl/certs/nginx.crt ]; then
     echo "Nginx: New SSL configuration has been set up."
 fi
 
-exec "$@"
+nginx -g "daemon off;"
 
+exec "$@"

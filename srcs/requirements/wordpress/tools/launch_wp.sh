@@ -1,24 +1,37 @@
-#!/bin/sh
+#!/bin/bash
 
-if [ -f ./wordpress/wp-config.php]
-then
-  echo "Wordpress is already installed"
-else
-  wget https://wordpress.org/latest.tar.gz
-	tar -xzvf latest.tar.gz
-	rm -rf latest.tar.gz
+curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 
-  rm -rf /etc/php/php-fpm.d/www.conf
-  cp /var/www/html/www.conf /etc/php/php-fpm.d/
+chmod +x wp-cli.phar
 
-  cd /var/www/html/wordpress
-  sed -i s"s/username_here/$WP_USER_USERNAME/g" wp-config-sample.php
-  sed -i s"s/password_here/$WP_USER_PASSWORD/g" wp-config-sample.php
-  sed -i s"s/localhost/$MYSQL_HOST/g" wp-config-sample.php
-  sed -i s"s/database_name_here/$MYSQL_DATABASE/g" wp-config-sample.php
+mv wp-cli.phar /usr/local/bin/wp-cli.phar
 
-  mv wp-config-sample.php wp-config.php
+WP="/usr/local/bin/wp-cli.phar"
+
+cd /var/www/wordpress/
+
+chmod -R 755 /var/www/wordpress/
+
+chown -R www-data:www-data /var/www/wordpress
+
+#------
+
+if [ ! -f "/var/www/wordpress/index.php" ]; then
+
+  $WP core download --allow-root
+
+  $WP config create --dbhost=mariadb:3306 --dbname="$MYSQL_HOST" --dbuser="$MYSQL_USERNAME" --dbpass="$MYSQL_USER_PASSWORD" --allow-root 
+
+  $WP core install --url="$ADDRESS" --title="$WP_TITLE" --admin-user="$WP_ADMIN_USERNAME" --admin-password="$WP_ADMIN_PASS" --admin-email="$WP_ADMIN_EMAIL" --allow-root
+
+  $WP user create "$WP_USER_USERNAME" "$WP_USER_EMAIL" --user-pass="$WP_USER_PASSWORD" --role="author" --allow-root
+
+  $WP option update comment_whitelist 0 --allow-root
 
 fi
 
-exec "$@"
+sed -i '36 s@/run/php/php7.4-fpm.sock@9000@' /etc/php/7.4/fpm/pool.d/www.conf
+
+mkdir -p /run/php
+
+exec /usr/sbin/php-fpm7.4 -F

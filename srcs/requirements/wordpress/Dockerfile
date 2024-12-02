@@ -2,15 +2,14 @@ FROM debian:bullseye
 
 EXPOSE 9000
 
-RUN apt update -y && apt install -y wget php-fpm php
+RUN apt update -y
+RUN apt install -y curl php7.4 php7.4-fpm php7.4-mysql 
 
-COPY ./conf/www.conf /var/www/html/
-COPY ./tools/launch_wp.sh /usr/local/bin/
+COPY ./tools/launch_wp.sh /
 
-RUN chmod +x /usr/local/bin/launch_wp.sh
+RUN chmod +x ./launch_wp.sh
 
-WORKDIR /var/www/html
+RUN mkdir -p /var/www/wordpress
 
-ENTRYPOINT ["/bin/bash", "/usr/local/bin/launch_wp.sh"]
+ENTRYPOINT ["./launch_wp.sh"]
 
-CMD ["/usr/sbin/php-fpm7.4","-F"] 

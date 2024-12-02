@@ -38,6 +38,8 @@ services:
    - wordpress
   networks:
    - dock_net
+  env_file:
+   - .env
 
  mariadb:
   container_name: mariadb
@@ -48,6 +50,7 @@ services:
   secrets:
    - db_root_pswrd
    - db_pswrd
+   - credentials
   volumes:
    - db:/var/lib/mysql
   networks:
