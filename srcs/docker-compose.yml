@@ -28,19 +28,6 @@ networks:
   driver: bridge
 
 services:
- nginx:
-  container_name: nginx
-  build: ./requirements/nginx/
-  restart: unless-stopped
-  ports:
-   - "443:443"
-  depends_on:
-   - wordpress
-  networks:
-   - dock_net
-  env_file:
-   - .env
-
  mariadb:
   container_name: mariadb
   build: ./requirements/mariadb/
@@ -55,6 +42,19 @@ services:
    - db:/var/lib/mysql
   networks:
    - dock_net
+
+ nginx:
+  container_name: nginx
+  build: ./requirements/nginx/
+  restart: unless-stopped
+  ports:
+   - "443:443"
+  depends_on:
+   - wordpress
+  networks:
+   - dock_net
+  env_file:
+   - .env
 
  wordpress:
   container_name: wordpress

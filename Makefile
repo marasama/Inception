@@ -24,6 +24,7 @@ down:
 fclean: down
 	sudo rm -rf  $(HOME)/data/wordpress
 	sudo rm -rf  $(HOME)/data/mariadb
+	sudo docker system prune -af
 re: fclean all
 
 .PHONY: up build stop restart remove down fclean re

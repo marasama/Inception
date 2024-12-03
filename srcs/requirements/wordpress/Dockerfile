@@ -3,7 +3,7 @@ FROM debian:bullseye
 EXPOSE 9000
 
 RUN apt update -y
-RUN apt install -y curl php7.4 php7.4-fpm php7.4-mysql 
+RUN apt install -y curl php7.4 php7.4-fpm php7.4-mysql sendmail
 
 COPY ./tools/launch_wp.sh /
 
