@@ -3,7 +3,7 @@ server
   listen 443 ssl;
   listen [::]:443 ssl;
 
-  server_name $ADDRESS;
+  server_name $DOMAIN_NAME;
 
   ssl_certificate /etc/ssl/certs/nginx.crt;
   ssl_certificate_key /etc/ssl/private/nginx.key;

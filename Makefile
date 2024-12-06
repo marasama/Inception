@@ -1,5 +1,5 @@
 all:
-	mkdir -p $(HOME)/data/wordpress
+	mkdir -p $(HOME)/data/html
 	mkdir -p $(HOME)/data/mariadb
 	make up
 
@@ -24,7 +24,7 @@ down:
 fclean: down
 	sudo rm -rf  $(HOME)/data/wordpress
 	sudo rm -rf  $(HOME)/data/mariadb
-	sudo docker system prune -af
+	sudo docker system prune -af --volumes
 re: fclean all
 
 .PHONY: up build stop restart remove down fclean re

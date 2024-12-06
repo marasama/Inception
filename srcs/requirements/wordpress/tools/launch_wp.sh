@@ -1,5 +1,11 @@
 #!/bin/bash
 
+MYSQL_USER_PASSWORD=$(cat /run/secrets/db_pass)
+
+WP_ADMIN_PASS=$(cat /run/secrets/wp_admin_pass)
+
+WP_USER_PASSWORD=$(cat /run/secrets/wp_pass)
+
 curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 
 chmod +x wp-cli.phar
@@ -8,32 +14,43 @@ mv wp-cli.phar /usr/local/bin/wp-cli.phar
 
 WP="/usr/local/bin/wp-cli.phar"
 
-cd /var/www/wordpress/
+mkdir -p /run/php/
 
-chmod -R 755 /var/www/wordpress/
+touch /run/php/php7.4-fpm.pid
 
-chown -R www-data:www-data /var/www/wordpress
+chmod -R 755 /var/www/html/
+
+chown -R www-data: /var/www/html/
 
 #------
 
 if [ ! -f "/var/www/wordpress/index.php" ]; then
 
-  $WP core download --allow-root
+  mkdir -p /var/www/html;
+  cd /var/www/html;
 
-  $WP config create --dbhost=mariadb:3306 --dbname="$MYSQL_HOST" --dbuser="$MYSQL_USERNAME" --dbpass="$MYSQL_USER_PASSWORD" --allow-root 
+  $WP core download --allow-root;
 
-  $WP core install --url="$ADDRESS" --title="$WP_TITLE" --admin-user="$WP_ADMIN_USERNAME" --admin-password="$WP_ADMIN_PASS" --admin-email="$WP_ADMIN_EMAIL" --allow-root
+  $WP config create --allow-root \
+  --dbhost=$MYSQL_HOST:3306 \
+  --dbname=$MYSQL_DATABASE \
+  --dbuser=$MYSQL_USERNAME \
+  --dbpass=$MYSQL_USER_PASSWORD;
 
-  $WP user create "$WP_USER_USERNAME" "$WP_USER_EMAIL" --user-pass="$WP_USER_PASSWORD" --role="author" --allow-root
+  $WP core install --allow-root \
+  --url=$DOMAIN_NAME \
+  --title=$WP_TITLE \
+  --admin-user=$WP_ADMIN_USERNAME \
+  --admin-password=$WP_ADMIN_PASS \
+  --admin-email=$WP_ADMIN_EMAIL;
 
-  $WP option update comment_whitelist 0 --allow-root
+  $WP user create --allow-root
+  $WP_USER_USERNAME \
+  $WP_USER_EMAIL \
+  --user-pass=$WP_USER_PASSWORD;
 
 fi
 
-sed -i '36 s@/run/php/php7.4-fpm.sock@9000@' /etc/php/7.4/fpm/pool.d/www.conf
-
-mkdir -p /run/php
+exec "$@"
 
 exec /usr/sbin/php-fpm7.4 --nodaemonize
-
-exec "$@"
