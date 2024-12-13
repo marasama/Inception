@@ -15,14 +15,14 @@ volumes:
   driver_opts:
    type: none
    o: bind
-   device: /home/abdul/data/mariadb
+   device: $HOME/data/mariadb
  wp:
   driver: local
   name: wp
   driver_opts:
    type: none
    o: bind
-   device: /home/abdul/data/html
+   device: $HOME/data/wordpress
 
 networks:
  dock_net:

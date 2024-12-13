@@ -13,4 +13,6 @@ RUN chmod +x ./launch_wp.sh
 
 RUN mkdir -p /var/www/html
 
-ENTRYPOINT ["./launch_wp.sh"]
+WORKDIR /var/www/html
+
+ENTRYPOINT ["/launch_wp.sh"]

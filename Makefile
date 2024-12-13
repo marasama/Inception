@@ -1,5 +1,5 @@
 all:
-	mkdir -p $(HOME)/data/html
+	mkdir -p $(HOME)/data/wordpress
 	mkdir -p $(HOME)/data/mariadb
 	make up
 
