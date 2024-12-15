@@ -11,7 +11,6 @@ services:
       - wp_admin_email
       - db_pass
       - db_login
-      - db_root_pass
     env_file:
       - .env
     volumes:
@@ -32,7 +31,6 @@ services:
       - wp_admin_email
       - db_pass
       - db_login
-      - db_root_pass
     env_file:
       - .env
     depends_on:
@@ -55,7 +53,6 @@ services:
       - wp_admin_email
       - db_pass
       - db_login
-      - db_root_pass
     ports:
       - 443:443
     env_file:
@@ -102,8 +99,6 @@ secrets:
     file: ../secrets/wp_admin_pass.txt
   wp_admin_email:
     file: ../secrets/wp_admin_email.txt
-  db_root_pass:
-    file: ../secrets/db_root_pass.txt
   db_login:
     file: ../secrets/db_login.txt
   db_pass:

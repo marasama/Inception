@@ -14,7 +14,7 @@ if [ ! -f /var/www/html/wp-config.php ]; then
         --dbname=$MYSQL_DATABASE \
         --dbuser=$(cat /var/run/secrets/db_login) \
         --dbpass=$(cat /var/run/secrets/db_pass) \
-        --dbhost=$MYSQL_DB_HOST;
+        --dbhost=$DB_HOST;
 
     echo "Wordpress: setting up..."
 
