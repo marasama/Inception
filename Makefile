@@ -1,30 +1,21 @@
-all:
-	mkdir -p $(HOME)/data/wordpress
-	mkdir -p $(HOME)/data/mariadb
-	make up
-
-up: build
-	sudo docker-compose -f ./srcs/docker-compose.yml up
+all: build
+	@docker-compose -f ./srcs/docker-compose.yml up
 
 build:
-	sudo docker-compose -f ./srcs/docker-compose.yml build
-
-stop:
-	sudo docker-compose -f ./srcs/docker-compose.yml stop
-
-restart:
-	sudo docker-compose -f ./srcs/docker-compose.yml restart
-
-remove:
-	sudo docker-compose -f ./srcs/docker-compose.yml rm
+	@mkdir -p $(HOME)/data/wordpress
+	@mkdir -p $(HOME)/data/mariadb
+	@sudo docker-compose -f ./srcs/docker-compose.yml build
 
 down:
-	sudo docker-compose -f ./srcs/docker-compose.yml down --volumes --rmi all
+	@sudo docker-compose -f ./srcs/docker-compose.yml down
 
-fclean: down
-	sudo rm -rf  $(HOME)/data/wordpress
-	sudo rm -rf  $(HOME)/data/mariadb
-	sudo docker system prune -af --volumes
+clean: 
+	@sudo rm -rf $(HOME)/data
+
+fclean: down clean
+	-@sudo docker volume rm $$(sudo docker volume ls -q)
+	@sudo docker system prune -af --volumes
+
 re: fclean all
 
-.PHONY: up build stop restart remove down fclean re
+.PHONY: all build down re clean fclean

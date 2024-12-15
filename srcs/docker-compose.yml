@@ -1,76 +1,110 @@
-secrets:
- db_pass:
-  file: ../secrets/db_pass.txt
- db_root_pass:
-  file: ../secrets/db_root_pass.txt
- wp_admin_pass:
-  file: ../secrets/wp_admin_pass.txt
- wp_pass:
-  file: ../secrets/wp_pass.txt
+services:
+  mariadb:
+    container_name: mariadb
+    build: ./requirements/mariadb
+    secrets:
+      - wp_user_login
+      - wp_admin_login
+      - wp_user_pass
+      - wp_admin_pass
+      - wp_user_email
+      - wp_admin_email
+      - db_pass
+      - db_login
+      - db_root_pass
+    env_file:
+      - .env
+    volumes:
+      - db-volume:/var/lib/mysql
+    networks:
+      - dock-net
+    restart: on-failure
+
+  wordpress:
+    container_name: wordpress
+    build: ./requirements/wordpress
+    secrets:
+      - wp_user_login
+      - wp_admin_login
+      - wp_user_pass
+      - wp_admin_pass
+      - wp_user_email
+      - wp_admin_email
+      - db_pass
+      - db_login
+      - db_root_pass
+    env_file:
+      - .env
+    depends_on:
+      - mariadb
+    volumes:
+      - wp-volume:/var/www/html
+    networks:
+      - dock-net
+    restart: on-failure
+
+  nginx:
+    container_name: nginx
+    build: ./requirements/nginx
+    secrets:
+      - wp_user_login
+      - wp_admin_login
+      - wp_user_pass
+      - wp_admin_pass
+      - wp_user_email
+      - wp_admin_email
+      - db_pass
+      - db_login
+      - db_root_pass
+    ports:
+      - 443:443
+    env_file:
+      - .env
+    depends_on:
+      - wordpress
+    volumes:
+      - wp-volume:/var/www/html
+    networks:
+      - dock-net
+    restart: on-failure
 
 volumes:
- db:
-  driver: local
-  name: db
-  driver_opts:
-   type: none
-   o: bind
-   device: $HOME/data/mariadb
- wp:
-  driver: local
-  name: wp
-  driver_opts:
-   type: none
-   o: bind
-   device: $HOME/data/wordpress
+  wp-volume:
+    driver: local
+    name: wp-volume
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/data/wordpress
+  db-volume:
+    driver: local
+    name: db-volume
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/data/mariadb
 
 networks:
- dock_net:
-  name: "dock_net"
-  driver: bridge
+  dock-net:
+    name: dock-net
+    driver: bridge
 
-services:
- mariadb:
-  container_name: mariadb
-  build: ./requirements/mariadb/
-  restart: unless-stopped
-  env_file:
-   - .env
-  secrets:
-   - db_root_pass
-   - db_pass
-  volumes:
-   - db:/var/lib/mysql
-  networks:
-   - dock_net
-
- nginx:
-  container_name: nginx
-  build: ./requirements/nginx/
-  restart: unless-stopped
-  ports:
-   - "443:443"
-  depends_on:
-   - wordpress
-  networks:
-   - dock_net
-  env_file:
-   - .env
-
- wordpress:
-  container_name: wordpress
-  build: ./requirements/wordpress/
-  restart: unless-stopped
-  env_file:
-   - .env
-  secrets:
-   - db_root_pass
-   - db_pass
-   - wp_pass
-   - wp_admin_pass
-  volumes:
-   - wp:/var/www/html
-  networks:
-   - dock_net
-  depends_on:
-   - mariadb 
+secrets:
+  wp_user_login:
+    file: ../secrets/wp_user_login.txt
+  wp_user_pass:
+    file: ../secrets/wp_user_pass.txt
+  wp_user_email:
+    file: ../secrets/wp_user_email.txt
+  wp_admin_login:
+    file: ../secrets/wp_admin_login.txt
+  wp_admin_pass:
+    file: ../secrets/wp_admin_pass.txt
+  wp_admin_email:
+    file: ../secrets/wp_admin_email.txt
+  db_root_pass:
+    file: ../secrets/db_root_pass.txt
+  db_login:
+    file: ../secrets/db_login.txt
+  db_pass:
+    file: ../secrets/db_pass.txt

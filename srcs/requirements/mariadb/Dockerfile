@@ -1,16 +1,16 @@
 FROM debian:bullseye
 
-RUN apt update
-RUN apt install -y mariadb-server
+RUN apt-get update && \
+    apt-get install -y mariadb-server
 
 EXPOSE 3306
 
 COPY ./conf/50-server.cnf /etc/mysql/mariadb.conf.d/
 
-COPY ./tools/entry.sh /usr/local/bin/
+COPY ./tools/mariadb.sh /tmp/
 
-RUN chmod +x /usr/local/bin/entry.sh
+RUN chmod +x /tmp/mariadb.sh
 
-ENTRYPOINT ["/usr/local/bin/entry.sh"]
+ENTRYPOINT [ "/tmp/mariadb.sh" ]
 
-CMD ["mariadb"]
+CMD [ "mariadbd" ]
